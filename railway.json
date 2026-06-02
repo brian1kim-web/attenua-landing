@@ -1,8 +1,5 @@
 {
-  "build": {
-    "builder": "NIXPACKS"
-  },
   "deploy": {
-    "startCommand": "python3 -m http.server 3000"
+    "startCommand": "node -e \"const h=require('http'),fs=require('fs');h.createServer((q,r)=>{r.writeHead(200,{'Content-Type':'text/html'});r.end(fs.readFileSync('index.html'))}).listen(3000)\""
   }
 }
