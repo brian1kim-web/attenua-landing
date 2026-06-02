@@ -1,5 +1,5 @@
 {
   "deploy": {
-    "startCommand": "node -e \"const h=require('http'),fs=require('fs');h.createServer((q,r)=>{r.writeHead(200,{'Content-Type':'text/html'});r.end(fs.readFileSync('index.html'))}).listen(3000)\""
+    "startCommand": "nginx -g 'daemon off;'"
   }
 }
