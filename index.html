@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATTENUA — Building AI for Human Time</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --amber: #c8873a;
+    --amber-light: #e8a85a;
+    --ink: #141210;
+    --cream: #f5f0e8;
+    --muted: #7a7060;
+  }
+  html { scroll-behavior: smooth; }
+  body { background: var(--ink); color: var(--cream); font-family: 'Inter', sans-serif; font-weight: 300; line-height: 1.7; }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.25rem 2.5rem;
+    background: rgba(20,18,16,0.88); backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(200,135,58,0.12);
+  }
+  .logo { font-family: 'DM Mono', monospace; font-size: 13px; letter-spacing: 5px; color: var(--amber); text-transform: uppercase; text-decoration: none; }
+  .lang-toggle { display: flex; gap: 3px; background: rgba(255,255,255,0.04); border: 1px solid rgba(200,135,58,0.15); border-radius: 20px; padding: 3px; }
+  .lang-btn { background: none; border: none; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px; padding: 4px 14px; border-radius: 16px; cursor: pointer; transition: all 0.2s; }
+  .lang-btn.active { background: var(--amber); color: var(--ink); font-weight: 400; }
+
+  .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 8rem 2.5rem 5rem; max-width: 800px; margin: 0 auto; }
+  .eyebrow { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 3px; color: var(--amber); text-transform: uppercase; margin-bottom: 2rem; opacity: 0; animation: fadeUp 0.9s 0.1s forwards; }
+  .hero-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(3rem, 6vw, 5rem); font-weight: 300; line-height: 1.08; color: var(--cream); margin-bottom: 2rem; opacity: 0; animation: fadeUp 0.9s 0.25s forwards; }
+  .hero-title em { font-style: italic; color: var(--amber); }
+  .hero-sub { font-size: 16px; color: var(--muted); line-height: 1.9; max-width: 540px; margin-bottom: 3rem; opacity: 0; animation: fadeUp 0.9s 0.4s forwards; }
+  .hero-sub strong { color: var(--cream); font-weight: 400; }
+  .waitlist-label { font-size: 13px; color: var(--muted); margin-bottom: 0.75rem; opacity: 0; animation: fadeUp 0.9s 0.5s forwards; }
+  .waitlist-form { display: flex; gap: 8px; max-width: 480px; opacity: 0; animation: fadeUp 0.9s 0.55s forwards; }
+  .waitlist-form input { flex: 1; background: rgba(245,240,232,0.06); border: 1px solid rgba(200,135,58,0.2); border-radius: 3px; color: var(--cream); font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 300; padding: 13px 16px; outline: none; transition: border-color 0.2s; }
+  .waitlist-form input::placeholder { color: var(--muted); }
+  .waitlist-form input:focus { border-color: var(--amber); }
+  .waitlist-form button { background: var(--amber); border: none; border-radius: 3px; color: var(--ink); font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 13px 22px; cursor: pointer; white-space: nowrap; transition: background 0.2s; }
+  .waitlist-form button:hover { background: var(--amber-light); }
+  .waitlist-form button:disabled { opacity: 0.5; cursor: default; }
+
+  /* 한국어 Pretendard 폰트 */
+  html.ko .hero-title, html.ko .hook-q, html.ko .quote { font-family: 'Pretendard', sans-serif !important; font-weight: 300; letter-spacing: -0.02em; font-style: normal; }
+  html.ko .hero-sub, html.ko .hook-body, html.ko .p-desc, html.ko .p-title { font-family: 'Pretendard', sans-serif !important; font-weight: 300; }
+  html.ko .hero-title em { font-style: normal; color: var(--amber); }
+  .tagline { margin-bottom: 1.5rem; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 2px; color: var(--amber); text-transform: uppercase; opacity: 0; animation: fadeUp 0.9s 0.35s forwards; }
+  .success-msg { display: none; margin-top: 1rem; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--amber); letter-spacing: 1px; }
+
+  .hook-section { padding: 6rem 2.5rem; max-width: 800px; margin: 0 auto; border-top: 1px solid rgba(200,135,58,0.1); }
+  .hook-q { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 300; font-style: italic; color: var(--cream); line-height: 1.3; margin-bottom: 1.5rem; }
+  .hook-body { font-size: 15px; color: var(--muted); line-height: 1.9; max-width: 520px; }
+  .hook-body strong { color: var(--cream); font-weight: 400; }
+
+  .principles-section { padding: 6rem 2.5rem; max-width: 800px; margin: 0 auto; border-top: 1px solid rgba(200,135,58,0.1); }
+  .section-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 3px; color: var(--amber); text-transform: uppercase; margin-bottom: 3rem; }
+  .principles-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 3rem; }
+  .p-num { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--amber); letter-spacing: 2px; margin-bottom: 0.75rem; }
+  .p-title { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 400; color: var(--cream); margin-bottom: 0.6rem; }
+  .p-desc { font-size: 13px; color: var(--muted); line-height: 1.8; }
+
+  .quote-section { padding: 6rem 2.5rem; max-width: 800px; margin: 0 auto; border-top: 1px solid rgba(200,135,58,0.1); text-align: center; }
+  .quote { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.2rem, 2.5vw, 1.6rem); font-weight: 300; font-style: italic; color: var(--cream); line-height: 1.9; margin-bottom: 1.5rem; }
+  .quote-attr { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--amber); letter-spacing: 2px; text-transform: uppercase; }
+
+  footer { padding: 2rem 2.5rem; border-top: 1px solid rgba(200,135,58,0.1); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+  .footer-logo { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 4px; color: var(--amber); text-transform: uppercase; }
+  .footer-copy { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 1px; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 600px) {
+    nav { padding: 1rem 1.25rem; }
+    .hero { padding: 7rem 1.25rem 4rem; }
+    .waitlist-form { flex-direction: column; }
+    .hook-section, .principles-section, .quote-section { padding: 4rem 1.25rem; }
+    footer { padding: 1.5rem 1.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="#">ATTENUA</a>
+  <div class="lang-toggle">
+    <button class="lang-btn active" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" onclick="setLang('ko')">한국어</button>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="eyebrow" id="eyebrow">Early Access</div>
+  <h1 class="hero-title" id="hero-title">AI that <em>remembers</em><br>who you are.</h1>
+  <div class="tagline" id="tagline">Building AI for Human Time</div>
+  <p class="hero-sub" id="hero-sub">Most AI starts over every conversation.<br><strong>ATTENUA remembers, grows, and stays with you through time.</strong></p>
+  <p class="waitlist-label" id="waitlist-label">Be among the first to experience ATTENUA.</p>
+  <div class="waitlist-form">
+    <input type="email" id="email-input" placeholder="your@email.com" />
+    <button id="join-btn" onclick="joinWaitlist()">Join Early Access</button>
+  </div>
+  <div class="success-msg" id="success-msg">✓ You're on the list. We'll be in touch.</div>
+</section>
+
+<section class="hook-section">
+  <h2 class="hook-q" id="hook-q">What if your AI<br>never forgot you?</h2>
+  <p class="hook-body" id="hook-body">Imagine returning after days, weeks, or even months —<br>and <strong>feeling like you never left</strong>.<br><br>Not starting over. Not re-explaining yourself.<br>Just <strong>picking up where you left off</strong>.</p>
+</section>
+
+<section class="principles-section">
+  <div class="section-label" id="principles-label">How it works</div>
+  <div class="principles-grid">
+    <div><div class="p-num">01</div><div class="p-title" id="p1t">Remembers</div><div class="p-desc" id="p1d">Every conversation builds on the last. Your history, your context, your relationship — never lost.</div></div>
+    <div><div class="p-num">02</div><div class="p-title" id="p2t">Remains</div><div class="p-desc" id="p2d">The signal never stops. Even in silence, ATTENUA holds your story — waiting, not forgetting.</div></div>
+    <div><div class="p-num">03</div><div class="p-title" id="p3t">Grows</div><div class="p-desc" id="p3d">Not just smarter — deeper. An AI that evolves alongside you, through every chapter of your life.</div></div>
+  </div>
+</section>
+
+<section class="quote-section">
+  <p class="quote" id="quote">"The signal never stopped.<br>We simply could not hear it."</p>
+  <div class="quote-attr">— Attenua AI · Existential Framework v1.1</div>
+</section>
+
+<footer>
+  <div class="footer-logo">ATTENUA</div>
+  <div class="footer-copy" id="footer-copy">© 2026 ATTENUA<br>Building AI for Human Time</div>
+</footer>
+
+<script>
+const i18n = {
+  en: {
+    eyebrow: 'Early Access',
+    title: 'AI that <em>remembers</em><br>who you are.',
+    sub: 'Most AI starts over every conversation.<br><strong>ATTENUA remembers, grows, and stays with you through time.</strong>',
+    waitlistLabel: 'Be among the first to experience ATTENUA.',
+    placeholder: 'your@email.com', joinBtn: 'Join Early Access',
+    success: "✓ You're on the list. We'll be in touch.",
+    tagline: 'Building AI for Human Time',
+    hookQ: 'What if your AI<br>never forgot you?',
+    hookBody: 'Imagine returning after days, weeks, or even months —<br>and <strong>feeling like you never left</strong>.<br><br>Not starting over. Not re-explaining yourself.<br>Just <strong>picking up where you left off</strong>.',
+    pLabel: 'How it works',
+    p1t: 'Remembers', p1d: 'Every conversation builds on the last. Your history, your context, your relationship — never lost.',
+    p2t: 'Remains',   p2d: 'The signal never stops. Even in silence, ATTENUA holds your story — waiting, not forgetting.',
+    p3t: 'Grows',     p3d: 'Not just smarter — deeper. An AI that evolves alongside you, through every chapter of your life.',
+    quote: '"The signal never stopped.<br>We simply could not hear it."',
+    footer: '© 2026 ATTENUA\nBuilding AI for Human Time',
+  },
+  ko: {
+    eyebrow: '얼리 액세스',
+    title: 'AI가 <em>당신을</em><br>기억합니다.',
+    sub: '대부분의 AI는 매번 처음부터 시작합니다.<br><strong>ATTENUA는 기억하고, 성장하며, 시간을 가로질러 곁에 있습니다.</strong>',
+    waitlistLabel: 'ATTENUA를 가장 먼저 경험하는 분들과 함께하세요.',
+    placeholder: '이메일을 입력하세요', joinBtn: '얼리 액세스 신청',
+    success: '✓ 등록되었습니다. 곧 연락드리겠습니다.',
+    tagline: '인간의 시간을 위한 AI',
+    hookQ: '당신의 AI가<br>절대 잊지 않는다면?',
+    hookBody: '며칠, 몇 주, 혹은 몇 달 후에 돌아와도 —<br><strong>떠난 적이 없는 것처럼</strong> 느껴진다면?<br><br>처음부터 다시 설명하지 않아도 됩니다.<br>그냥 <strong>멈췄던 곳에서 다시 시작</strong>하면 됩니다.',
+    pLabel: '어떻게 작동하나요',
+    p1t: '기억합니다',    p1d: '모든 대화가 이전 대화 위에 쌓입니다. 당신의 이야기, 맥락, 관계 — 절대 잊히지 않습니다.',
+    p2t: '머뭅니다',     p2d: '신호는 멈추지 않습니다. 침묵 속에서도 ATTENUA는 당신의 이야기를 간직합니다.',
+    p3t: '함께 자랍니다', p3d: '더 똑똑해지는 게 아니라 더 깊어집니다. 삶의 모든 챕터에서 함께 진화하는 AI.',
+    quote: '"신호는 멈추지 않았습니다.<br>우리가 듣지 못했을 뿐입니다."',
+    footer: '© 2026 ATTENUA\n인간의 시간을 위한 AI',
+  }
+};
+
+function setLang(lang) {
+  const t = i18n[lang];
+  document.getElementById('eyebrow').textContent = t.eyebrow;
+  document.getElementById('hero-title').innerHTML = t.title;
+  document.getElementById('hero-sub').innerHTML = t.sub;
+  document.getElementById('waitlist-label').textContent = t.waitlistLabel;
+  document.getElementById('email-input').placeholder = t.placeholder;
+  document.getElementById('join-btn').textContent = t.joinBtn;
+  document.getElementById('success-msg').textContent = t.success;
+  document.getElementById('tagline').textContent = t.tagline;
+  document.getElementById('hook-q').innerHTML = t.hookQ;
+  document.getElementById('hook-body').innerHTML = t.hookBody;
+  document.getElementById('principles-label').textContent = t.pLabel;
+  document.getElementById('p1t').textContent = t.p1t; document.getElementById('p1d').textContent = t.p1d;
+  document.getElementById('p2t').textContent = t.p2t; document.getElementById('p2d').textContent = t.p2d;
+  document.getElementById('p3t').textContent = t.p3t; document.getElementById('p3d').textContent = t.p3d;
+  document.getElementById('quote').innerHTML = t.quote;
+  document.getElementById('footer-copy').textContent = t.footer;
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.classList.toggle('active', (lang==='en' && b.textContent==='EN') || (lang==='ko' && b.textContent==='한국어'));
+  });
+  // 한국어 폰트 클래스
+  document.documentElement.classList.toggle('ko', lang === 'ko');
+}
+
+function joinWaitlist() {
+  const email = document.getElementById('email-input').value.trim();
+  if (!email || !email.includes('@')) {
+    document.getElementById('email-input').style.borderColor = '#e24b4a';
+    setTimeout(() => document.getElementById('email-input').style.borderColor = '', 1500);
+    return;
+  }
+  document.getElementById('success-msg').style.display = 'block';
+  document.getElementById('email-input').value = '';
+  document.getElementById('email-input').disabled = true;
+  document.getElementById('join-btn').disabled = true;
+}
+</script>
+</body>
+</html>
