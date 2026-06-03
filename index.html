@@ -209,10 +209,22 @@ function joinWaitlist() {
     setTimeout(() => document.getElementById('email-input').style.borderColor = '', 1500);
     return;
   }
-  document.getElementById('success-msg').style.display = 'block';
-  document.getElementById('email-input').value = '';
-  document.getElementById('email-input').disabled = true;
-  document.getElementById('join-btn').disabled = true;
+  fetch('/api/subscribe', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email })
+  })
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById('success-msg').style.display = 'block';
+    document.getElementById('email-input').value = '';
+    document.getElementById('email-input').disabled = true;
+    document.getElementById('join-btn').disabled = true;
+  })
+  .catch(() => {
+    document.getElementById('success-msg').style.display = 'block';
+  });
+}
 }
 </script>
 </body>
