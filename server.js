@@ -12,20 +12,35 @@ app.post('/api/subscribe', async (req, res) => {
   }
 
   try {
-    const response = await fetch('https://api.resend.com/contacts', {
+    // 1. Audience에 연락처 저장
+    const contactRes = await fetch('https://api.resend.com/contacts', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email: email, unsubscribed: false })
+    });
+    const contactData = await contactRes.json();
+    console.log('Contact created:', contactData);
+
+    // 2. Automation 트리거 이벤트 발송
+    const eventRes = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        email: email,
-        unsubscribed: false
+        from: 'Hello <hello@attenua.io>',
+        to: [email],
+        subject: 'Welcome to the Silence',
+        html: '<p>Welcome to ATTENUA.</p>'
       })
     });
+    const eventData = await eventRes.json();
+    console.log('Email sent:', eventData);
 
-    const data = await response.json();
-    console.log('Resend response:', data);
     res.json({ success: true });
   } catch (error) {
     console.error('Error:', error);
