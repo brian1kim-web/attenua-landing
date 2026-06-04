@@ -49,7 +49,7 @@ app.post('/api/subscribe', async (req, res) => {
         
         <!-- 헤더 로고 -->
         <tr><td style="padding:0;border-bottom:1px solid #2a2520;">
-          <img src="https://www.attenua.io/attenua_logo.png" alt="ATTENUA AI" width="560" style="display:block;width:100%;max-width:560px;">
+        <img src="https://www.attenua.io/attenua_logo.png" alt="ATTENUA AI" width="280" style="display:block;width:50%;max-width:280px;margin:0 auto;">
         </td></tr>
         
         <!-- 본문 영어 -->
