@@ -12,7 +12,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ATTENUA — Building AI for Human Time</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400&family=Inter:wght@300;400;500&family=Noto+Sans+JP:wght@300;400&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -58,6 +58,11 @@
   html.ko .hero-sub, html.ko .hook-body, html.ko .p-desc, html.ko .p-title { font-family: 'Pretendard', sans-serif !important; font-weight: 300; }
   html.ko .hero-title em { font-style: normal; color: var(--amber); }
   html.ko .waitlist-form button { font-family: 'Pretendard', sans-serif !important; font-size: 13px; letter-spacing: 1px; }
+  /* 일본어 Noto Sans JP 폰트 */
+  html.ja .hero-title, html.ja .hook-q, html.ja .quote { font-family: 'Noto Sans JP', sans-serif !important; font-weight: 300; letter-spacing: 0; font-style: normal; }
+  html.ja .hero-sub, html.ja .hook-body, html.ja .p-desc, html.ja .p-title { font-family: 'Noto Sans JP', sans-serif !important; font-weight: 300; }
+  html.ja .hero-title em { font-style: normal; color: var(--amber); }
+  html.ja .waitlist-form button { font-family: 'Noto Sans JP', sans-serif !important; font-size: 13px; letter-spacing: 1px; }
   .tagline { margin-bottom: 1.5rem; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 2px; color: var(--amber); text-transform: uppercase; opacity: 0; animation: fadeUp 0.9s 0.35s forwards; }
   .success-msg { display: none; margin-top: 1rem; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--amber); letter-spacing: 1px; }
 
@@ -97,8 +102,9 @@
 <nav>
   <a class="logo" href="#">ATTENUA</a>
   <div class="lang-toggle">
-    <button class="lang-btn active" onclick="setLang('en')">EN</button>
-    <button class="lang-btn" onclick="setLang('ko')">한국어</button>
+    <button class="lang-btn active" data-lang="en" onclick="chooseLang('en')">EN</button>
+    <button class="lang-btn" data-lang="ko" onclick="chooseLang('ko')">한국어</button>
+    <button class="lang-btn" data-lang="ja" onclick="chooseLang('ja')">日本語</button>
   </div>
 </nav>
 
@@ -174,6 +180,23 @@ const i18n = {
     p3t: '함께 자랍니다', p3d: '더 똑똑해지는 게 아니라 더 깊어집니다. 삶의 모든 챕터에서 함께 진화하는 AI.',
     quote: '"신호는 멈추지 않았습니다.<br>우리가 듣지 못했을 뿐입니다."',
     footer: '© 2026 ATTENUA\n인간의 시간을 위한 AI',
+  },
+  ja: {
+    eyebrow: 'アーリーアクセス',
+    title: 'あなたが誰かを<em>覚えている</em><br>AI。',
+    sub: 'ほとんどのAIは、会話のたびにゼロから始まります。<br><strong>ATTENUAは、時を超えてあなたを覚え、成長し、そばに寄り添い続けます。</strong>',
+    waitlistLabel: 'ATTENUAをいち早く体験しませんか。',
+    placeholder: 'メールアドレスを入力', joinBtn: 'アーリーアクセスに登録',
+    success: '✓ 登録が完了しました。追ってご連絡します。',
+    tagline: '人の時間のためのAIをつくる',
+    hookQ: 'もし、AIがあなたを<br>決して忘れなかったら？',
+    hookBody: '数日、数週間、あるいは数か月ぶりに戻ってきても —<br><strong>まるで離れていなかったかのように</strong>感じられる。<br><br>最初からやり直すことも、説明し直すこともありません。<br><strong>前回の続きから</strong>、そのまま始められます。',
+    pLabel: 'しくみ',
+    p1t: '覚えている', p1d: 'すべての会話が、前の会話の上に積み重なっていきます。あなたの歩みも、文脈も、関係も、決して失われません。',
+    p2t: 'とどまる',   p2d: 'シグナルは決して途切れません。沈黙の中でも、ATTENUAはあなたの物語を抱き続けます。忘れずに、待ちながら。',
+    p3t: '成長する',   p3d: 'ただ賢くなるのではなく、より深く。人生のあらゆる章を、あなたと共に進化していくAI。',
+    quote: '"シグナルは途切れていなかった。<br>ただ、私たちに聞こえなかっただけだ。"',
+    footer: '© 2026 ATTENUA\n人の時間のためのAIをつくる',
   }
 };
 
@@ -196,11 +219,34 @@ function setLang(lang) {
   document.getElementById('quote').innerHTML = t.quote;
   document.getElementById('footer-copy').textContent = t.footer;
   document.querySelectorAll('.lang-btn').forEach(b => {
-    b.classList.toggle('active', (lang==='en' && b.textContent==='EN') || (lang==='ko' && b.textContent==='한국어'));
+    b.classList.toggle('active', b.dataset.lang === lang);
   });
-  // 한국어 폰트 클래스
+  // 언어별 폰트 클래스와 <html lang>
   document.documentElement.classList.toggle('ko', lang === 'ko');
+  document.documentElement.classList.toggle('ja', lang === 'ja');
+  document.documentElement.lang = lang;
 }
+
+// 언어 버튼: 고른 언어를 이 브라우저에 저장한다
+function chooseLang(lang) {
+  try { localStorage.setItem('attenua-lang', lang); } catch (e) {}
+  setLang(lang);
+}
+
+// 처음 열 때: 저장된 선택 → 브라우저 언어 목록에서 처음 나오는 ko / ja / en → 그 외는 EN
+function detectLang() {
+  try {
+    const saved = localStorage.getItem('attenua-lang');
+    if (saved && i18n[saved]) return saved;
+  } catch (e) {}
+  const prefs = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language || 'en'];
+  for (const p of prefs) {
+    const base = String(p).toLowerCase().split('-')[0];
+    if (base === 'ko' || base === 'ja' || base === 'en') return base;
+  }
+  return 'en';
+}
+setLang(detectLang());
 
 function joinWaitlist() {
   const email = document.getElementById('email-input').value.trim();
