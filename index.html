@@ -34,9 +34,21 @@
     border-bottom: 1px solid rgba(200,135,58,0.12);
   }
   .logo { font-family: 'DM Mono', monospace; font-size: 13px; letter-spacing: 5px; color: var(--amber); text-transform: uppercase; text-decoration: none; }
-  .lang-toggle { display: flex; gap: 3px; background: rgba(255,255,255,0.04); border: 1px solid rgba(200,135,58,0.15); border-radius: 20px; padding: 3px; }
-  .lang-btn { background: none; border: none; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px; padding: 4px 14px; border-radius: 16px; cursor: pointer; transition: all 0.2s; }
-  .lang-btn.active { background: var(--amber); color: var(--ink); font-weight: 400; }
+  /* 언어 메뉴 (지구본) */
+  .lang-menu { position: relative; }
+  .lang-trigger { display: flex; align-items: center; gap: 7px; background: rgba(255,255,255,0.04); border: 1px solid rgba(200,135,58,0.15); border-radius: 20px; padding: 6px 12px 6px 10px; color: var(--cream); font-family: 'Inter', 'Pretendard', 'Noto Sans JP', sans-serif; font-size: 12px; font-weight: 400; cursor: pointer; transition: border-color 0.2s, color 0.2s; }
+  .lang-trigger:hover, .lang-trigger[aria-expanded="true"] { border-color: rgba(200,135,58,0.5); color: var(--amber); }
+  .lang-trigger:focus-visible, .lang-item:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+  .lang-globe { color: var(--amber); flex: none; }
+  .lang-caret { color: var(--muted); font-size: 9px; transition: transform 0.2s; }
+  .lang-trigger[aria-expanded="true"] .lang-caret { transform: rotate(180deg); color: var(--amber); }
+  .lang-list { position: absolute; right: 0; top: calc(100% + 8px); min-width: 168px; margin: 0; padding: 4px; list-style: none; background: var(--ink); border: 1px solid rgba(200,135,58,0.28); border-radius: 12px; box-shadow: 0 12px 32px rgba(0,0,0,0.45); z-index: 110; }
+  .lang-list[hidden] { display: none; }
+  .lang-item { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 16px; background: none; border: none; border-radius: 8px; padding: 9px 12px; color: var(--cream); font-family: 'Inter', 'Pretendard', 'Noto Sans JP', sans-serif; font-size: 13px; font-weight: 300; text-align: left; cursor: pointer; }
+  .lang-item:hover, .lang-item:focus { background: rgba(200,135,58,0.10); outline: none; }
+  .lang-item[aria-checked="true"] { color: var(--amber); font-weight: 400; }
+  .lang-check { visibility: hidden; color: var(--amber); }
+  .lang-item[aria-checked="true"] .lang-check { visibility: visible; }
 
   .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 8rem 2.5rem 5rem; max-width: 800px; margin: 0 auto; }
   .eyebrow { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 3px; color: var(--amber); text-transform: uppercase; margin-bottom: 2rem; opacity: 0; animation: fadeUp 0.9s 0.1s forwards; }
@@ -101,10 +113,12 @@
 
 <nav>
   <a class="logo" href="#">ATTENUA</a>
-  <div class="lang-toggle">
-    <button class="lang-btn active" data-lang="en" onclick="chooseLang('en')">EN</button>
-    <button class="lang-btn" data-lang="ko" onclick="chooseLang('ko')">한국어</button>
-    <button class="lang-btn" data-lang="ja" onclick="chooseLang('ja')">日本語</button>
+  <div class="lang-menu" id="lang-menu">
+    <button type="button" class="lang-trigger" id="lang-trigger" aria-haspopup="menu" aria-expanded="false" aria-controls="lang-list" aria-label="언어 선택 / Language" aria-describedby="lang-current">
+      <svg class="lang-globe" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9.5"/><ellipse cx="12" cy="12" rx="4.2" ry="9.5"/><path d="M2.5 12h19M3.8 7.5h16.4M3.8 16.5h16.4"/></svg>
+      <span id="lang-current">English</span><span class="lang-caret" aria-hidden="true">▾</span>
+    </button>
+    <ul class="lang-list" id="lang-list" role="menu" aria-label="언어 선택 / Language" hidden></ul>
   </div>
 </nav>
 
@@ -148,6 +162,7 @@
 <script>
 const i18n = {
   en: {
+    langName: 'English',
     eyebrow: 'Early Access',
     title: 'AI that <em>remembers</em><br>who you are.',
     sub: 'Most AI starts over every conversation.<br><strong>ATTENUA remembers, grows, and stays with you through time.</strong>',
@@ -165,6 +180,7 @@ const i18n = {
     footer: '© 2026 ATTENUA\nBuilding AI for Human Time',
   },
   ko: {
+    langName: '한국어',
     eyebrow: '얼리 액세스',
     title: 'AI가 <em>당신을</em><br>기억합니다.',
     sub: '대부분의 AI는 매번 처음부터 시작합니다.<br><strong>ATTENUA는 기억하고, 성장하며, 시간을 가로질러 곁에 있습니다.</strong>',
@@ -182,6 +198,7 @@ const i18n = {
     footer: '© 2026 ATTENUA\n인간의 시간을 위한 AI',
   },
   ja: {
+    langName: '日本語',
     eyebrow: 'アーリーアクセス',
     title: 'あなたが誰かを<em>覚えている</em><br>AI。',
     sub: 'ほとんどのAIは、会話のたびにゼロから始まります。<br><strong>ATTENUAは、時を超えてあなたを覚え、成長し、そばに寄り添い続けます。</strong>',
@@ -218,12 +235,12 @@ function setLang(lang) {
   document.getElementById('p3t').textContent = t.p3t; document.getElementById('p3d').textContent = t.p3d;
   document.getElementById('quote').innerHTML = t.quote;
   document.getElementById('footer-copy').textContent = t.footer;
-  document.querySelectorAll('.lang-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.lang === lang);
+  document.getElementById('lang-current').textContent = t.langName || lang;
+  document.querySelectorAll('.lang-item').forEach(b => {
+    b.setAttribute('aria-checked', b.dataset.lang === lang ? 'true' : 'false');
   });
   // 언어별 폰트 클래스와 <html lang>
-  document.documentElement.classList.toggle('ko', lang === 'ko');
-  document.documentElement.classList.toggle('ja', lang === 'ja');
+  Object.keys(i18n).forEach(code => document.documentElement.classList.toggle(code, code === lang));
   document.documentElement.lang = lang;
 }
 
@@ -246,6 +263,69 @@ function detectLang() {
   }
   return 'en';
 }
+// 언어 메뉴: i18n 에 있는 언어로 목록을 만든다. 언어를 더할 때는 i18n 에 한 덩어리(langName 포함)만 더하면 된다.
+const langMenu = document.getElementById('lang-menu');
+const langTrigger = document.getElementById('lang-trigger');
+const langList = document.getElementById('lang-list');
+function langItems() { return Array.from(langList.querySelectorAll('.lang-item')); }
+function buildLangMenu() {
+  langList.innerHTML = '';
+  Object.keys(i18n).forEach(code => {
+    const li = document.createElement('li');
+    li.setAttribute('role', 'none');
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'lang-item';
+    b.setAttribute('role', 'menuitemradio');
+    b.setAttribute('aria-checked', 'false');
+    b.tabIndex = -1;
+    b.dataset.lang = code;
+    b.lang = code;
+    const name = document.createElement('span');
+    name.textContent = i18n[code].langName || code;
+    const check = document.createElement('span');
+    check.className = 'lang-check';
+    check.setAttribute('aria-hidden', 'true');
+    check.textContent = '✓';
+    b.append(name, check);
+    b.addEventListener('click', () => { chooseLang(code); closeLangMenu(true); });
+    li.appendChild(b);
+    langList.appendChild(li);
+  });
+}
+function openLangMenu(where) {
+  langList.hidden = false;
+  langTrigger.setAttribute('aria-expanded', 'true');
+  const items = langItems();
+  const current = items.findIndex(b => b.getAttribute('aria-checked') === 'true');
+  const i = where === 'last' ? items.length - 1 : (current >= 0 ? current : 0);
+  if (items[i]) items[i].focus();
+}
+function closeLangMenu(focusTrigger) {
+  if (langList.hidden) return;
+  langList.hidden = true;
+  langTrigger.setAttribute('aria-expanded', 'false');
+  if (focusTrigger) langTrigger.focus();
+}
+langTrigger.addEventListener('click', () => { if (langList.hidden) openLangMenu(); else closeLangMenu(false); });
+langTrigger.addEventListener('keydown', e => {
+  if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLangMenu(); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); openLangMenu('last'); }
+});
+langList.addEventListener('keydown', e => {
+  const items = langItems();
+  const i = items.indexOf(document.activeElement);
+  if (e.key === 'ArrowDown') { e.preventDefault(); items[(i + 1) % items.length].focus(); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); }
+  else if (e.key === 'Home') { e.preventDefault(); items[0].focus(); }
+  else if (e.key === 'End') { e.preventDefault(); items[items.length - 1].focus(); }
+  else if (e.key === 'Escape') { e.preventDefault(); closeLangMenu(true); }
+  else if (e.key === 'Tab') { closeLangMenu(false); }
+});
+document.addEventListener('click', e => { if (!langMenu.contains(e.target)) closeLangMenu(false); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLangMenu(true); });
+
+buildLangMenu();
 setLang(detectLang());
 
 function joinWaitlist() {
