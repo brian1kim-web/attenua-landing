@@ -84,6 +84,9 @@
   /* 일본어 설명: 단어 중간에서 줄이 나뉘지 않게 (지원하는 브라우저에서) */
   html.ja .hero-sub { word-break: auto-phrase; }
   .hero-sub .nb { white-space: nowrap; }
+  /* 일본어의 "AI": 앞뒤 일본 글자와 붙어 보이지 않게 양옆에 글자 폭의 약 4분의 1 틈 (줄 맨 앞이면 오른쪽만) */
+  html.ja .ai { margin: 0 0.25em; }
+  html.ja .ai.ai-start { margin-left: 0; }
   html.ja .waitlist-form button { font-family: 'Noto Sans JP', sans-serif !important; font-size: 13px; letter-spacing: 1px; }
   .success-msg { display: none; margin-top: 1rem; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--amber); letter-spacing: 1px; }
 
@@ -206,8 +209,8 @@ const i18n = {
   ja: {
     langName: '日本語',
     eyebrow: 'アーリーアクセス',
-    title: '<span class="tl">あなたがAIに</span><br><span class="tl">合わせるのではなく、</span><br><span class="tl">AIがあなたに</span><br><span class="tl"><em>合わせていきます</em>。</span>',
-    sub: '人の時間のためのAIをつくる。<br><strong>ATTENUAは、あなたから学び、成長し、<span class="nb">いつまでも</span>そばに寄り添います。</strong>',
+    title: '<span class="tl">あなたが<span class="ai">AI</span>に</span><br><span class="tl">合わせるのではなく、</span><br><span class="tl"><span class="ai ai-start">AI</span>があなたに</span><br><span class="tl"><em>合わせていきます</em>。</span>',
+    sub: '人の時間のための<span class="ai">AI</span>をつくる。<br><strong>ATTENUAは、あなたから学び、成長し、<span class="nb">いつまでも</span>そばに寄り添います。</strong>',
     waitlistLabel: 'ATTENUAをいち早く体験しませんか。',
     placeholder: 'メールアドレスを入力', joinBtn: 'アーリーアクセスに登録',
     success: '✓ 登録が完了しました。追ってご連絡します。',
