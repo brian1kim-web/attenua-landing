@@ -12,7 +12,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ATTENUA — Building AI for Human Time</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400&family=Inter:wght@300;400;500&family=Noto+Sans+JP:wght@300;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400&family=Inter:wght@300;400;500&family=Noto+Sans+JP:wght@300;400&family=Noto+Serif+JP:wght@300;400&family=Noto+Serif+KR:wght@300;400&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -55,10 +55,12 @@
   .hero-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(3rem, 6vw, 5rem); font-weight: 300; line-height: 1.08; color: var(--cream); margin-bottom: 2rem; opacity: 0; animation: fadeUp 0.9s 0.25s forwards; }
   .hero-title em { font-style: italic; color: var(--amber); }
   /* 회사 약속 제목: 두 줄, 줄은 정해 둔 곳(쉼표 뒤)에서만 나뉜다. 폰에서 넘치지 않게 화면 너비에 맞춰 크기를 정한다 */
-  .hero-title .tl { white-space: nowrap; }
+  .hero-title .tl { display: block; white-space: nowrap; }
+  /* 큰 제목 안의 "AI": 흐린 금빛 (사이트 주황과 흐린 글자색의 중간). 동사의 밝은 주황보다 덜 튄다 */
+  .hero-title .ai { color: #a17c4d; }
   .hero-title { font-size: min(9.8vw, 4.8rem); }
   html.ko .hero-title { font-size: min(9.6vw, 4.4rem); line-height: 1.25; }
-  html.ja .hero-title { font-size: min(8.4vw, 4rem); line-height: 1.3; }
+  html.ja .hero-title { font-size: min(8vw, 4rem); line-height: 1.3; }
   .hero-sub { font-size: 16px; color: var(--muted); line-height: 1.9; max-width: 540px; margin-bottom: 3rem; opacity: 0; animation: fadeUp 0.9s 0.4s forwards; }
   .hero-sub strong { color: var(--cream); font-weight: 400; }
   .waitlist-label { font-size: 13px; color: var(--muted); margin-bottom: 0.75rem; opacity: 0; animation: fadeUp 0.9s 0.5s forwards; }
@@ -80,12 +82,24 @@
   html.ja .hero-sub, html.ja .hook-body, html.ja .p-desc, html.ja .p-title { font-family: 'Noto Sans JP', sans-serif !important; font-weight: 300; }
   html.ja .hero-title em { font-style: normal; color: var(--amber); }
   /* 한국어·일본어 큰 제목: 영어처럼 또렷하게 한 단계 굵게 */
-  html.ko .hero-title, html.ja .hero-title { font-weight: 400; }
+  /* 한국어·일본어 큰 제목: 영어처럼 명조 (Noto Serif KR / JP). 주황 동사도 같은 명조, 기울이지 않음 */
+  html.ko .hero-title { font-family: 'Noto Serif KR', serif !important; font-weight: 400; letter-spacing: -0.01em; }
+  html.ja .hero-title { font-family: 'Noto Serif JP', serif !important; font-weight: 400; letter-spacing: 0; }
+  /* 폰: 네 줄 (각 줄을 둘로) / PC: 두 줄, 쉼표에서. 오른쪽 끝에 닿지 않게 여유를 둔 크기 */
+  @media (max-width: 767.98px) {
+    html.ko .hero-title .w, html.ja .hero-title .w { display: block; }
+  }
+  @media (min-width: 768px) {
+    html.ko .hero-title { font-size: min(5.6vw, 2.9rem); }
+    html.ja .hero-title { font-size: min(4.5vw, 2.3rem); }
+  }
   /* 일본어 설명: 단어 중간에서 줄이 나뉘지 않게 (지원하는 브라우저에서) */
   html.ja .hero-sub { word-break: auto-phrase; }
   .hero-sub .nb { white-space: nowrap; }
   /* 일본어의 "AI": 앞뒤 일본 글자와 붙어 보이지 않게 양옆에 글자 폭의 약 4분의 1 틈 (줄 맨 앞이면 오른쪽만) */
-  html.ja .ai { margin: 0 0.25em; }
+  html.ja .ai { margin: 0 0.125em; }
+  /* 한국어 큰 제목의 "AI": 오른쪽에만 글자 폭의 약 8분의 1 틈 (AI에, AI가) */
+  html.ko .hero-title .ai { margin-right: 0.125em; }
   html.ja .ai.ai-start { margin-left: 0; }
   html.ja .waitlist-form button { font-family: 'Noto Sans JP', sans-serif !important; font-size: 13px; letter-spacing: 1px; }
   .success-msg { display: none; margin-top: 1rem; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--amber); letter-spacing: 1px; }
@@ -136,7 +150,7 @@
 
 <section class="hero">
   <div class="eyebrow" id="eyebrow">Early Access</div>
-  <h1 class="hero-title" id="hero-title"><span class="tl">You don't adapt to AI.</span><br><span class="tl">AI <em>adapts</em> to you.</span></h1>
+  <h1 class="hero-title" id="hero-title"><span class="tl">You don't adapt to <span class="ai">AI</span>.</span><span class="tl"><span class="ai">AI</span> <em>adapts</em> to you.</span></h1>
   <p class="hero-sub" id="hero-sub">Building AI for human time.<br><strong>ATTENUA learns, grows, and stays with you through time.</strong></p>
   <p class="waitlist-label" id="waitlist-label">Be among the first to experience ATTENUA.</p>
   <div class="waitlist-form">
@@ -175,7 +189,7 @@ const i18n = {
   en: {
     langName: 'English',
     eyebrow: 'Early Access',
-    title: '<span class="tl">You don\'t adapt to AI.</span><br><span class="tl">AI <em>adapts</em> to you.</span>',
+    title: '<span class="tl">You don\'t adapt to <span class="ai">AI</span>.</span><span class="tl"><span class="ai">AI</span> <em>adapts</em> to you.</span>',
     sub: 'Building AI for human time.<br><strong>ATTENUA learns, grows, and stays with you through time.</strong>',
     waitlistLabel: 'Be among the first to experience ATTENUA.',
     placeholder: 'your@email.com', joinBtn: 'Join Early Access',
@@ -192,7 +206,7 @@ const i18n = {
   ko: {
     langName: '한국어',
     eyebrow: '얼리 액세스',
-    title: '<span class="tl">당신이 AI에</span><br><span class="tl">맞추는 게 아니라,</span><br><span class="tl">AI가 당신에게</span><br><span class="tl"><em>맞춥니다</em>.</span>',
+    title: '<span class="tl"><span class="w">당신이 <span class="ai">AI</span>에</span> <span class="w">맞추는 게 아니라,</span></span><span class="tl"><span class="w"><span class="ai">AI</span>가 당신에게</span> <span class="w"><em>맞춥니다</em>.</span></span>',
     sub: '사람의 시간을 위한 AI를 만듭니다.<br><strong>ATTENUA는 배우고, 자라며, 시간이 흘러도 당신 곁에 머뭅니다.</strong>',
     waitlistLabel: 'ATTENUA를 가장 먼저 경험하는 분들과 함께하세요.',
     placeholder: '이메일을 입력하세요', joinBtn: '얼리 액세스 신청',
@@ -209,7 +223,7 @@ const i18n = {
   ja: {
     langName: '日本語',
     eyebrow: 'アーリーアクセス',
-    title: '<span class="tl">あなたが<span class="ai">AI</span>に</span><br><span class="tl">合わせるのではなく、</span><br><span class="tl"><span class="ai ai-start">AI</span>があなたに</span><br><span class="tl"><em>合わせていきます</em>。</span>',
+    title: '<span class="tl"><span class="w">あなたが<span class="ai">AI</span>に</span><span class="w">合わせるのではなく、</span></span><span class="tl"><span class="w"><span class="ai ai-start">AI</span>があなたに</span><span class="w"><em>合わせていきます</em>。</span></span>',
     sub: '人の時間のための<span class="ai">AI</span>をつくる。<br><strong>ATTENUAは、あなたから学び、成長し、<span class="nb">いつまでも</span>そばに寄り添います。</strong>',
     waitlistLabel: 'ATTENUAをいち早く体験しませんか。',
     placeholder: 'メールアドレスを入力', joinBtn: 'アーリーアクセスに登録',
