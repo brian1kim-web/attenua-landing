@@ -65,11 +65,12 @@ ${t.after.map(p).join('\n')}
           <p style="margin:0;color:#c8873a;font-size:13px;letter-spacing:0.05em;text-align:${align};">${esc(t.signature)}</p>
         </td></tr>
 
-        <!-- footer: one link to the site, its words in each words file's "footer" (Brian 2026-11-13: no city or
-             country name; a light cream like the body text so it shows on the dark bar; the color is on the link
-             itself so mail apps do not paint it blue). A right-to-left language writes its own arrow (←). -->
-        <tr><td dir="${dir}" style="padding:20px 40px;background-color:#0e0c0a;border-top:1px solid #2a2520;text-align:center;">
-          <p style="margin:0;font-size:12px;letter-spacing:0.05em;font-family:${t.font};"><a href="${SITE_URL}" style="color:#d4cfc8;text-decoration:none;">${esc(t.footer)}</a></p>
+        <!-- footer: one link to the site, its words in each words file's "footer" (Brian 2026-11-13, latest: no city
+             or country name, no arrow; a light cream like the body text so it shows on the dark bar; the color is on
+             the link itself so mail apps do not paint it blue). The link fills the whole bar (display:block, the
+             padding inside it), so pressing anywhere on the line goes to the site. -->
+        <tr><td dir="${dir}" style="padding:0;background-color:#0e0c0a;border-top:1px solid #2a2520;text-align:center;">
+          <a href="${SITE_URL}" style="display:block;padding:20px 40px;color:#d4cfc8;text-decoration:none;font-size:12px;letter-spacing:0.05em;font-family:${t.font};text-align:center;">${esc(t.footer)}</a>
         </td></tr>
 
       </table>

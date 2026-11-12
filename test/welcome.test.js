@@ -16,7 +16,7 @@ test('language: ko, ja and their regions; anything else or nothing is English', 
 // The words Brian chose on 2026-11-13 (second version), as Sophie sent them
 const SUBJECT = { en: 'Thank you for finding us first', ko: '먼저 찾아와 주셔서 고맙습니다', ja: '最初に見つけてくださり、ありがとうございます' };
 // The bottom line: one link to the site, in each language (Brian 2026-11-13, latest)
-const FOOTER = { ko: 'attenua.io 바로가기 →', en: 'Visit attenua.io →', ja: 'attenua.ioを見る →' };
+const FOOTER = { ko: 'attenua.io 바로가기', en: 'Visit attenua.io', ja: 'attenua.ioを見る' };
 
 test('subjects as Sophie gave them', () => {
   for (const l of ['en', 'ko', 'ja']) assert.equal(welcomeMail(l).subject, SUBJECT[l], l);
@@ -77,6 +77,10 @@ test('the same look in all three: logo, quote box, amber signature, bottom line,
     assert.equal(links[0][1], 'https://attenua.io', lang + ' link address');
     assert.match(links[0][2], /color:#d4cfc8;/, lang + ' light cream link');
     assert.equal(links[0][3], FOOTER[lang], lang + ' link words');
+    assert.ok(!/[→←]/.test(html), lang + ' no arrow');
+    // the whole line is the link: it fills the bar (block, the bar's padding inside the link, none left on the cell)
+    assert.match(links[0][2], /^display:block;padding:20px 40px;/, lang + ' the link fills the bar');
+    assert.ok(html.includes('<td dir="ltr" style="padding:0;background-color:#0e0c0a;'), lang + ' no padding outside the link');
     assert.ok(!/color:#4a4038/.test(html), lang + ' no dark grey bottom line');
     assert.ok(!/text-transform:uppercase/.test(html), lang + ' no capitals forced on the link');
     for (const old of ['SEOUL', 'Seoul', 'ALWAYS BY YOUR SIDE', 'The signal never stopped'])
@@ -217,7 +221,7 @@ test('room for right to left (Arabic later): the mail turns around by dir, the b
   assert.ok(rtl.includes('border-right:2px solid #c8873a'), 'the quote line on the right');
   assert.ok(!rtl.includes('border-left:2px'), 'not on the left');
   assert.ok(!/text-align:left/.test(rtl), 'text from the right');
-  assert.match(rtl, /<td dir="rtl" style="padding:20px 40px;/, 'the bottom link is in the language too, so it turns around');
+  assert.match(rtl, /<td dir="rtl" style="padding:0;background-color:#0e0c0a;/, 'the bottom link is in the language too, so it turns around');
   const ltr = welcomeMail('ko').html;
   assert.match(ltr, /<html lang="ko" dir="ltr">/);
   assert.ok(ltr.includes('border-left:2px solid #c8873a') && !ltr.includes('border-right:2px'));
