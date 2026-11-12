@@ -15,7 +15,8 @@ test('language: ko, ja and their regions; anything else or nothing is English', 
 
 // The words Brian chose on 2026-11-13 (second version), as Sophie sent them
 const SUBJECT = { en: 'Thank you for finding us first', ko: '먼저 찾아와 주셔서 고맙습니다', ja: '最初に見つけてくださり、ありがとうございます' };
-const FOOTER = 'ATTENUA.IO · SEOUL · ALWAYS BY YOUR SIDE.';
+// The bottom line: one link to the site, in each language (Brian 2026-11-13, latest)
+const FOOTER = { ko: 'attenua.io 바로가기', en: 'Visit attenua.io', ja: 'attenua.ioを見る' };
 
 test('subjects as Sophie gave them', () => {
   for (const l of ['en', 'ko', 'ja']) assert.equal(welcomeMail(l).subject, SUBJECT[l], l);
@@ -37,7 +38,7 @@ test('the new words, line by line, as Sophie gave them', () => {
   assert.deepEqual(TEXT.ja.quote, ['一緒に過ごす時間が増えるほど、あなたをもっとよく守り、支えます。', 'しばらく静かでも、つながりは続いています。']);
   assert.deepEqual(TEXT.ja.after, ['準備ができたら、いちばんにお知らせします。お待ちいただき、ありがとうございます。']);
   assert.equal(TEXT.ja.signature, '— ATTENUA · 人の時間のためのAI');
-  for (const l of ['en', 'ko', 'ja']) assert.equal(TEXT[l].footer, FOOTER, l + ' footer');
+  for (const l of ['en', 'ko', 'ja']) assert.equal(TEXT[l].footer, FOOTER[l], l + ' footer');
 });
 
 test('one language per mail: no other language\'s words in it', () => {
@@ -70,8 +71,20 @@ test('the same look in all three: logo, quote box, amber signature, bottom line,
     assert.ok(html.includes('border-left:2px solid #c8873a;padding:16px 20px;background-color:#1c1814;'), lang + ' quote box');
     assert.equal((html.match(/font-style:italic/g) || []).length, TEXT[lang].quote.length, lang + ' one italic line per quote line');
     assert.ok(/color:#c8873a;font-size:13px;letter-spacing:0\.05em;text-align:left;">— ATTENUA · /.test(html), lang + ' amber signature');
-    assert.ok(html.includes(`text-transform:uppercase;font-family:Georgia,'Times New Roman',serif;">${FOOTER}</p>`), lang + ' bottom line');
-    assert.ok(!html.includes('The signal never stopped'), lang + ' no old bottom line');
+    // the bottom line is one link to https://attenua.io, in a light cream on the link itself (not the old dark grey)
+    const links = [...html.matchAll(/<a href="([^"]+)" style="([^"]+)">([^<]+)<\/a>/g)];
+    assert.equal(links.length, 1, lang + ' exactly one link');
+    assert.equal(links[0][1], 'https://attenua.io', lang + ' link address');
+    assert.match(links[0][2], /color:#d4cfc8;/, lang + ' light cream link');
+    assert.equal(links[0][3], FOOTER[lang], lang + ' link words');
+    assert.ok(!/[→←]/.test(html), lang + ' no arrow');
+    // the whole line is the link: it fills the bar (block, the bar's padding inside the link, none left on the cell)
+    assert.match(links[0][2], /^display:block;padding:20px 40px;/, lang + ' the link fills the bar');
+    assert.ok(html.includes('<td dir="ltr" style="padding:0;background-color:#0e0c0a;'), lang + ' no padding outside the link');
+    assert.ok(!/color:#4a4038/.test(html), lang + ' no dark grey bottom line');
+    assert.ok(!/text-transform:uppercase/.test(html), lang + ' no capitals forced on the link');
+    for (const old of ['SEOUL', 'Seoul', 'ALWAYS BY YOUR SIDE', 'The signal never stopped'])
+      assert.ok(!html.includes(old), lang + ' no ' + old);
     assert.ok(html.includes('<meta charset="UTF-8">'), lang + ' UTF-8');
   }
   assert.match(welcomeMail('ko').html, /font-family:'Noto Serif KR'[^;]*Batang[^;]*serif;/);
@@ -194,6 +207,13 @@ test('languages.js runs in the browser too (window.ATTENUA_LANGS) and matches li
   assert.equal(pick('zh_CN', ['zh', 'en']), 'zh');
 });
 
+test('no city or country name in any mail (Brian 2026-11-13)', () => {
+  for (const l of ['en', 'ko', 'ja']) {
+    const html = welcomeMail(l).html;
+    for (const place of ['Seoul', 'SEOUL', '서울', 'ソウル', 'Korea', '한국에', '韓国', 'Japan ', '東京', 'Tokyo']) assert.ok(!html.includes(place), l + ': ' + place);
+  }
+});
+
 test('room for right to left (Arabic later): the mail turns around by dir, the bottom line stays left to right', () => {
   const rtl = renderMail({ ...TEXT.en, subject: 'x' }, 'ar', 'rtl');
   assert.match(rtl, /<html lang="ar" dir="rtl">/);
@@ -201,7 +221,7 @@ test('room for right to left (Arabic later): the mail turns around by dir, the b
   assert.ok(rtl.includes('border-right:2px solid #c8873a'), 'the quote line on the right');
   assert.ok(!rtl.includes('border-left:2px'), 'not on the left');
   assert.ok(!/text-align:left/.test(rtl), 'text from the right');
-  assert.match(rtl, /<td dir="ltr" style="padding:20px 40px;/, 'the English bottom line stays left to right');
+  assert.match(rtl, /<td dir="rtl" style="padding:0;background-color:#0e0c0a;/, 'the bottom link is in the language too, so it turns around');
   const ltr = welcomeMail('ko').html;
   assert.match(ltr, /<html lang="ko" dir="ltr">/);
   assert.ok(ltr.includes('border-left:2px solid #c8873a') && !ltr.includes('border-right:2px'));
