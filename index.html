@@ -184,10 +184,12 @@
   <div class="footer-copy" id="footer-copy">© 2026 ATTENUA<br>Building AI for Human Time</div>
 </footer>
 
+<!-- the one language list, shared with the welcome mail (languages.js): code, menu name, writing direction -->
+<script src="/languages.js"></script>
 <script>
+// the screen words per language; which languages exist and their menu names come from languages.js
 const i18n = {
   en: {
-    langName: 'English',
     eyebrow: 'Early Access',
     title: '<span class="tl">You don\'t adapt to <span class="ai">AI</span>.</span><span class="tl"><span class="ai">AI</span> <em>adapts</em> to you.</span>',
     sub: 'Building AI for human time.<br><strong>ATTENUA learns, grows, and stays with you through time.</strong>',
@@ -204,7 +206,6 @@ const i18n = {
     footer: '© 2026 ATTENUA\nBuilding AI for Human Time',
   },
   ko: {
-    langName: '한국어',
     eyebrow: '얼리 액세스',
     title: '<span class="tl"><span class="w">당신이 <span class="ai">AI</span>에</span> <span class="w">맞추는 게 아니라,</span></span><span class="tl"><span class="w"><span class="ai">AI</span>가 당신에게</span> <span class="w"><em>맞춥니다</em>.</span></span>',
     sub: '사람의 시간을 위한 AI를 만듭니다.<br><strong>ATTENUA는 배우고, 자라며, 시간이 흘러도 당신 곁에 머뭅니다.</strong>',
@@ -221,7 +222,6 @@ const i18n = {
     footer: '© 2026 ATTENUA\n인간의 시간을 위한 AI',
   },
   ja: {
-    langName: '日本語',
     eyebrow: 'アーリーアクセス',
     title: '<span class="tl"><span class="w">あなたが<span class="ai">AI</span>に</span><span class="w">合わせるのではなく、</span></span><span class="tl"><span class="w"><span class="ai ai-start">AI</span>があなたに</span><span class="w"><em>合わせていきます</em>。</span></span>',
     sub: '人の時間のための<span class="ai">AI</span>をつくる。<br><strong>ATTENUAは、あなたから学び、成長し、<span class="nb">いつまでも</span>そばに寄り添います。</strong>',
@@ -256,13 +256,23 @@ function setLang(lang) {
   document.getElementById('p3t').textContent = t.p3t; document.getElementById('p3d').textContent = t.p3d;
   document.getElementById('quote').innerHTML = t.quote;
   document.getElementById('footer-copy').textContent = t.footer;
-  document.getElementById('lang-current').textContent = t.langName || lang;
+  document.getElementById('lang-current').textContent = langInfo(lang).name;
   document.querySelectorAll('.lang-item').forEach(b => {
     b.setAttribute('aria-checked', b.dataset.lang === lang ? 'true' : 'false');
   });
-  // 언어별 폰트 클래스와 <html lang>
-  Object.keys(i18n).forEach(code => document.documentElement.classList.toggle(code, code === lang));
+  // 언어별 폰트 클래스와 <html lang>, 쓰는 방향(<html dir>: 아랍어처럼 오른쪽에서 왼쪽이면 rtl)
+  SITE_CODES.forEach(code => document.documentElement.classList.toggle(code, code === lang));
   document.documentElement.lang = lang;
+  document.documentElement.dir = langInfo(lang).dir;
+}
+
+// 언어 목록은 languages.js 한 곳에서 온다 (환영 메일과 같은 목록). 화면 글(i18n)이 있는 언어만 화면에 보인다.
+// languages.js 를 못 받았을 때도 화면은 i18n 언어로 그대로 돈다.
+const LANGS = window.ATTENUA_LANGS || null;
+const SITE_CODES = LANGS ? LANGS.LANGUAGES.map(l => l.code).filter(c => i18n[c]) : Object.keys(i18n);
+function langInfo(code) {
+  const l = LANGS && LANGS.byCode(code);
+  return { name: (l && l.name) || code, dir: (l && l.dir) || 'ltr' };
 }
 
 // 언어 버튼: 고른 언어를 이 브라우저에 저장한다
@@ -275,26 +285,26 @@ function chooseLang(lang) {
 function detectLang() {
   try {
     const saved = localStorage.getItem('attenua-lang');
-    if (saved && i18n[saved]) return saved;
+    if (saved && SITE_CODES.includes(saved)) return saved;
   } catch (e) {}
   const prefs = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language || 'en'];
-  const codes = Object.keys(i18n);
-  const find = tag => codes.find(c => c.toLowerCase() === tag);
+  // 메일과 같은 규칙(languages.js pick): pt-BR 처럼 지역까지 같으면 먼저, 아니면 ko-KR → ko
+  const find = tag => SITE_CODES.find(c => c.toLowerCase() === tag);
+  const pick = LANGS ? (p => LANGS.pick(p, SITE_CODES)) : (p => { const t = String(p).toLowerCase(); return find(t) || find(t.split('-')[0]); });
   for (const p of prefs) {
-    const tag = String(p).toLowerCase();
-    const hit = find(tag) || find(tag.split('-')[0]);  // pt-BR 처럼 지역까지 같으면 먼저, 아니면 ko-KR → ko
+    const hit = pick(p);
     if (hit) return hit;
   }
   return 'en';
 }
-// 언어 메뉴: i18n 에 있는 언어로 목록을 만든다. 언어를 더할 때는 i18n 에 한 덩어리(langName 포함)만 더하면 된다.
+// 언어 메뉴: languages.js 의 순서와 이름으로 만든다. 새 언어: languages.js 한 줄 + i18n 화면 글 + welcome-texts 메일 글.
 const langMenu = document.getElementById('lang-menu');
 const langTrigger = document.getElementById('lang-trigger');
 const langList = document.getElementById('lang-list');
 function langItems() { return Array.from(langList.querySelectorAll('.lang-item')); }
 function buildLangMenu() {
   langList.innerHTML = '';
-  Object.keys(i18n).forEach(code => {
+  SITE_CODES.forEach(code => {
     const li = document.createElement('li');
     li.setAttribute('role', 'none');
     const b = document.createElement('button');
@@ -306,7 +316,7 @@ function buildLangMenu() {
     b.dataset.lang = code;
     b.lang = code;
     const name = document.createElement('span');
-    name.textContent = i18n[code].langName || code;
+    name.textContent = langInfo(code).name;
     const check = document.createElement('span');
     check.className = 'lang-check';
     check.setAttribute('aria-hidden', 'true');
@@ -362,7 +372,8 @@ function joinWaitlist() {
   fetch('/api/subscribe', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email })
+    // the screen language (detectLang or the visitor's choice, set by setLang): the welcome mail comes in it
+    body: JSON.stringify({ email, lang: document.documentElement.lang })
   })
   .then(res => res.json())
   .then(data => {
