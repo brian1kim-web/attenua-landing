@@ -9,7 +9,7 @@ const path = require('path');
 const { LANGUAGES, DEFAULT, pick } = require('./languages');
 
 const TEXT_DIR = path.join(__dirname, 'welcome-texts');
-const FIELDS = ['subject', 'font', 'lineHeight', 'paragraphs', 'quote', 'after', 'signature'];
+const FIELDS = ['subject', 'font', 'lineHeight', 'paragraphs', 'quote', 'after', 'signature', 'footer'];
 
 /** {code: words} for every language in languages.js that has a words file. */
 const TEXT = Object.freeze(Object.fromEntries(LANGUAGES
@@ -63,9 +63,9 @@ ${t.after.map(p).join('\n')}
           <p style="margin:0;color:#c8873a;font-size:13px;letter-spacing:0.05em;text-align:${align};">${esc(t.signature)}</p>
         </td></tr>
 
-        <!-- footer (the same English line in every language) -->
+        <!-- footer: each words file's "footer" (today the same English line in every language) -->
         <tr><td dir="ltr" style="padding:20px 40px;background-color:#0e0c0a;border-top:1px solid #2a2520;text-align:center;">
-          <p style="margin:0;color:#4a4038;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;font-family:Georgia,'Times New Roman',serif;">attenua.io · Seoul · The signal never stopped.</p>
+          <p style="margin:0;color:#4a4038;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;font-family:Georgia,'Times New Roman',serif;">${esc(t.footer)}</p>
         </td></tr>
 
       </table>

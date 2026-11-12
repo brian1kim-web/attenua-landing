@@ -13,14 +13,35 @@ test('language: ko, ja and their regions; anything else or nothing is English', 
   }
 });
 
+// The words Brian chose on 2026-11-13 (second version), as Sophie sent them
+const SUBJECT = { en: 'Thank you for finding us first', ko: '먼저 찾아와 주셔서 고맙습니다', ja: '最初に見つけてくださり、ありがとうございます' };
+const FOOTER = 'ATTENUA.IO · SEOUL · ALWAYS BY YOUR SIDE.';
+
 test('subjects as Sophie gave them', () => {
-  assert.equal(welcomeMail('en').subject, 'Welcome to the Silence');
-  assert.equal(welcomeMail('ko').subject, '침묵 속으로 오신 것을 환영합니다');
-  assert.equal(welcomeMail('ja').subject, '静けさへようこそ');
+  for (const l of ['en', 'ko', 'ja']) assert.equal(welcomeMail(l).subject, SUBJECT[l], l);
+});
+
+test('the new words, line by line, as Sophie gave them', () => {
+  assert.deepEqual(TEXT.ko.paragraphs, ['안녕하세요,', 'ATTENUA를 가장 먼저 찾아 주신 분 중 한 분이 되어 주셔서 고맙습니다.',
+    '사람이 AI에 맞추는 게 아니라, AI가 사람에게 맞춥니다. 그게 ATTENUA의 약속이에요. 서두르지 않고, 당신의 속도에 맞춰, 시간이 갈수록 당신을 더 잘 알고 도와주는 AI를 만들고 있어요.']);
+  assert.deepEqual(TEXT.ko.quote, ['함께한 시간이 쌓일수록, 당신을 더 잘 지키고 돕습니다.', '잠시 조용해도, 관계는 계속 이어집니다.']);
+  assert.deepEqual(TEXT.ko.after, ['준비가 되면 가장 먼저 알려 드릴게요. 기다려 주셔서 고맙습니다.']);
+  assert.equal(TEXT.ko.signature, '— ATTENUA · 인간의 시간을 위한 AI');
+  assert.deepEqual(TEXT.en.paragraphs, ['Hello,', 'Thank you for being one of the very first to find ATTENUA.',
+    "You don't adapt to AI. AI adapts to you. That's the ATTENUA promise. We're building an AI that never rushes you, moves at your pace, and comes to know and help you better as time goes on."]);
+  assert.deepEqual(TEXT.en.quote, ['The more time we share, the better it can protect and help you.', 'Even in quiet moments, the connection carries on.']);
+  assert.deepEqual(TEXT.en.after, ["We'll let you know first when we're ready. Thank you for waiting."]);
+  assert.equal(TEXT.en.signature, '— ATTENUA · AI for Human Time');
+  assert.deepEqual(TEXT.ja.paragraphs, ['こんにちは。', 'ATTENUAを最初に見つけてくださった方のお一人になっていただき、ありがとうございます。',
+    '人がAIに合わせるのではなく、AIが人に合わせます。それがATTENUAの約束です。急がず、あなたのペースに合わせて、時間とともにあなたをもっとよく知り、支えるAIをつくっています。']);
+  assert.deepEqual(TEXT.ja.quote, ['一緒に過ごす時間が増えるほど、あなたをもっとよく守り、支えます。', 'しばらく静かでも、つながりは続いています。']);
+  assert.deepEqual(TEXT.ja.after, ['準備ができたら、いちばんにお知らせします。お待ちいただき、ありがとうございます。']);
+  assert.equal(TEXT.ja.signature, '— ATTENUA · 人の時間のためのAI');
+  for (const l of ['en', 'ko', 'ja']) assert.equal(TEXT[l].footer, FOOTER, l + ' footer');
 });
 
 test('one language per mail: no other language\'s words in it', () => {
-  const words = { en: 'You are one of the very first to find us.', ko: '당신은 저희를 가장 먼저 발견한 분들 중 한 명입니다.', ja: 'あなたは、私たちを最初に見つけてくださった方のおひとりです。' };
+  const words = { en: 'Thank you for being one of the very first to find ATTENUA.', ko: 'ATTENUA를 가장 먼저 찾아 주신 분 중 한 분이 되어 주셔서 고맙습니다.', ja: 'ATTENUAを最初に見つけてくださった方のお一人になっていただき、ありがとうございます。' };
   for (const lang of ['en', 'ko', 'ja']) {
     const { html } = welcomeMail(lang);
     for (const other of Object.keys(words)) {
@@ -38,7 +59,7 @@ test('every sentence Sophie gave is in its mail, whole', () => {
     const { html } = welcomeMail(lang);
     const t = TEXT[lang];
     const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    for (const s of [...t.paragraphs, ...t.quote, ...t.after, t.signature]) assert.ok(html.includes(esc(s)), lang + ': ' + s);
+    for (const s of [...t.paragraphs, ...t.quote, ...t.after, t.signature, t.footer]) assert.ok(html.includes(esc(s)), lang + ': ' + s);
   }
 });
 
@@ -47,9 +68,10 @@ test('the same look in all three: logo, quote box, amber signature, bottom line,
     const { html } = welcomeMail(lang);
     assert.ok(html.includes('https://www.attenua.io/attenua_logo.png'), lang + ' logo');
     assert.ok(html.includes('border-left:2px solid #c8873a;padding:16px 20px;background-color:#1c1814;'), lang + ' quote box');
-    assert.equal((html.match(/font-style:italic/g) || []).length, 3, lang + ' three quote lines');
+    assert.equal((html.match(/font-style:italic/g) || []).length, TEXT[lang].quote.length, lang + ' one italic line per quote line');
     assert.ok(/color:#c8873a;font-size:13px;letter-spacing:0\.05em;text-align:left;">— ATTENUA · /.test(html), lang + ' amber signature');
-    assert.ok(html.includes('attenua.io · Seoul · The signal never stopped.'), lang + ' bottom line');
+    assert.ok(html.includes(`text-transform:uppercase;font-family:Georgia,'Times New Roman',serif;">${FOOTER}</p>`), lang + ' bottom line');
+    assert.ok(!html.includes('The signal never stopped'), lang + ' no old bottom line');
     assert.ok(html.includes('<meta charset="UTF-8">'), lang + ' UTF-8');
   }
   assert.match(welcomeMail('ko').html, /font-family:'Noto Serif KR'[^;]*Batang[^;]*serif;/);
@@ -88,7 +110,7 @@ function harness({ contactOk = true } = {}) {
 }
 
 test('signup: the contact keeps its language and one mail goes in it', async () => {
-  for (const [lang, want, subject] of [['ko', 'ko', '침묵 속으로 오신 것을 환영합니다'], ['ja-JP', 'ja', '静けさへようこそ'], ['fr', 'en', 'Welcome to the Silence'], [undefined, 'en', 'Welcome to the Silence']]) {
+  for (const [lang, want, subject] of [['ko', 'ko', SUBJECT.ko], ['ja-JP', 'ja', SUBJECT.ja], ['fr', 'en', SUBJECT.en], [undefined, 'en', SUBJECT.en]]) {
     const h = harness();
     const res = await h.run({ email: 'a@example.com', lang });
     assert.equal(res.code, 200);
@@ -107,7 +129,7 @@ test('signup: if Resend refuses the language, the contact is kept without it and
   const res = await h.run({ email: 'b@example.com', lang: 'ko' });
   assert.equal(res.code, 200);
   assert.deepEqual(h.calls.map((c) => [c.url.split('/').pop(), !!c.body.properties]), [['contacts', true], ['contacts', false], ['emails', false]]);
-  assert.equal(h.calls[2].body.subject, '침묵 속으로 오신 것을 환영합니다');
+  assert.equal(h.calls[2].body.subject, SUBJECT.ko);
 });
 
 // --- one language list for the screen and the mail (Sophie 2026-11-13: nine more languages later) ---
@@ -140,9 +162,8 @@ test('each words file has every part, as words', () => {
   for (const code of LANGS) {
     const t = TEXT[code];
     assert.deepEqual(Object.keys(t).sort(), [...FIELDS].sort(), code);
-    for (const k of ['subject', 'font', 'lineHeight', 'signature']) assert.ok(typeof t[k] === 'string' && t[k].trim(), code + ' ' + k);
+    for (const k of ['subject', 'font', 'lineHeight', 'signature', 'footer']) assert.ok(typeof t[k] === 'string' && t[k].trim(), code + ' ' + k);
     for (const k of ['paragraphs', 'quote', 'after']) assert.ok(Array.isArray(t[k]) && t[k].length && t[k].every((s) => typeof s === 'string' && s.trim()), code + ' ' + k);
-    assert.equal(t.quote.length, 3, code + ' three quote lines');
   }
 });
 
