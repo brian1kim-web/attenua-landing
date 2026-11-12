@@ -1,20 +1,19 @@
 {
-  "subject": "Welcome to the Silence",
+  "subject": "Thank you for finding us first",
   "font": "Georgia,'Times New Roman',serif",
   "lineHeight": "1.8",
   "paragraphs": [
     "Hello,",
-    "You are one of the very first to find us.",
-    "At ATTENUA, we believe that for an AI to truly understand you, it must first learn how to wait. Most technology is built for the \"Now\"—fast, loud, and fleeting. We are building for Human Time."
+    "Thank you for being one of the very first to find ATTENUA.",
+    "You don't adapt to AI. AI adapts to you. That's the ATTENUA promise. We're building an AI that never rushes you, moves at your pace, and comes to know and help you better as time goes on."
   ],
   "quote": [
-    "Memory is more than just data storage; it is continuity.",
-    "Silence is not an absence, but a \"Potential Resonance\"—a space where meaning grows.",
-    "The Signal never stops; we are simply learning how to hear it again."
+    "The more time we share, the better it can protect and help you.",
+    "Even in quiet moments, the connection carries on."
   ],
   "after": [
-    "We will reach out when the first layer of the AI Family Home is ready for you to inhabit. Until then, thank you for trusting us with your time.",
-    "Welcome to the family."
+    "We'll let you know first when we're ready. Thank you for waiting."
   ],
-  "signature": "— ATTENUA · Building AI for Human Time"
+  "signature": "— ATTENUA · AI for Human Time",
+  "footer": "ATTENUA.IO · SEOUL · ALWAYS BY YOUR SIDE."
 }
