@@ -362,7 +362,8 @@ function joinWaitlist() {
   fetch('/api/subscribe', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email })
+    // the screen language (detectLang or the visitor's choice, set by setLang): the welcome mail comes in it
+    body: JSON.stringify({ email, lang: document.documentElement.lang })
   })
   .then(res => res.json())
   .then(data => {
