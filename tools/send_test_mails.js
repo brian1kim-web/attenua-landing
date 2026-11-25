@@ -1,8 +1,9 @@
-// Three test welcome mails (Korean, Japanese, English) to one address, so Brian sees them before the site goes online.
+// Test welcome mails (every language in languages.js, or the ones named) to one address, so Brian sees them before the site goes online.
 // Sends mails only: no contact is made. The Resend key is read from this terminal's RESEND_API_KEY, never written down.
-//   node tools/send_test_mails.js you@example.com
+//   node tools/send_test_mails.js you@example.com [es ko ...]
 const { welcomeMail } = require('../welcome');
 const { FROM } = require('../subscribe');
+const { LANGUAGES } = require('../languages');
 
 async function main() {
   const to = process.argv[2];
@@ -10,7 +11,9 @@ async function main() {
   if (!to || !to.includes('@')) { console.error('usage: node tools/send_test_mails.js you@example.com'); process.exit(2); }
   if (!key) { console.error('RESEND_API_KEY is not set in this terminal'); process.exit(2); }
   let failed = 0;
-  for (const lang of ['ko', 'ja', 'en']) {
+  // 2026-11-26: the languages to send may follow the address (e.g. es); none -> every language in languages.js
+  const langs = process.argv.slice(3).length ? process.argv.slice(3) : LANGUAGES.map((l) => l.code);
+  for (const lang of langs) {
     const m = welcomeMail(lang);
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',

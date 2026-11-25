@@ -61,6 +61,9 @@
   .hero-title { font-size: min(9.8vw, 4.8rem); }
   html.ko .hero-title { font-size: min(9.6vw, 4.4rem); line-height: 1.25; }
   html.ja .hero-title { font-size: min(8vw, 4rem); line-height: 1.3; }
+  /* Spanish (2026-11-26): the first line is long (35 letters), so a smaller size keeps it on one line on a PC; on a phone it
+     splits after "quien" (the .w rule below), the second line stays whole */
+  html.es .hero-title { font-size: min(6.3vw, 3.2rem); }
   .hero-sub { font-size: 16px; color: var(--muted); line-height: 1.9; max-width: 540px; margin-bottom: 3rem; opacity: 0; animation: fadeUp 0.9s 0.4s forwards; }
   .hero-sub strong { color: var(--cream); font-weight: 400; }
   .waitlist-label { font-size: 13px; color: var(--muted); margin-bottom: 0.75rem; opacity: 0; animation: fadeUp 0.9s 0.5s forwards; }
@@ -87,7 +90,8 @@
   html.ja .hero-title { font-family: 'Noto Serif JP', serif !important; font-weight: 400; letter-spacing: 0; }
   /* 폰: 네 줄 (각 줄을 둘로) / PC: 두 줄, 쉼표에서. 오른쪽 끝에 닿지 않게 여유를 둔 크기 */
   @media (max-width: 767.98px) {
-    html.ko .hero-title .w, html.ja .hero-title .w { display: block; }
+    html.ko .hero-title .w, html.ja .hero-title .w, html.es .hero-title .w { display: block; }
+    html.es .hero-title { font-size: min(9.8vw, 4.8rem); }
   }
   @media (min-width: 768px) {
     html.ko .hero-title { font-size: min(5.6vw, 2.9rem); }
@@ -236,6 +240,24 @@ const i18n = {
     p3t: '成長する',   p3d: 'ただ賢くなるのではなく、より深く。人生のあらゆる章を、あなたと共に進化していくAI。',
     quote: '"シグナルは途切れていなかった。<br>ただ、私たちに聞こえなかっただけだ。"',
     footer: '© 2026 ATTENUA\n人の時間のためのAIをつくる',
+  },
+  // Spanish (Brian 2026-11-22/26): Latin American, "tú"; the title and the two lines under it are Sophie's words,
+  // the rest checked by Sophie 2026-11-26 (English | Spanish table). "IA" gets the same colour as "AI".
+  es: {
+    eyebrow: 'Acceso anticipado',
+    title: '<span class="tl"><span class="w">No eres tú quien</span> <span class="w">se adapta a la <span class="ai">IA</span>.</span></span><span class="tl">La <span class="ai">IA</span> <em>se adapta</em> a ti.</span>',
+    sub: 'Creamos IA para el tiempo humano.<br><strong>ATTENUA aprende, crece y permanece a tu lado a lo largo del tiempo.</strong>',
+    waitlistLabel: 'Sé de los primeros en conocer ATTENUA.',
+    placeholder: 'tu@correo.com', joinBtn: 'Unirme al acceso anticipado',
+    success: '✓ Ya estás en la lista. Te escribiremos pronto.',
+    hookQ: '¿Y si tu IA<br>nunca te olvidara?',
+    hookBody: 'Imagina volver después de días, semanas o incluso meses —<br>y <strong>sentir que nunca te fuiste</strong>.<br><br>Sin empezar de cero. Sin volver a explicarte.<br>Solo <strong>retomar donde lo dejaste</strong>.',
+    pLabel: 'Cómo funciona',
+    p1t: 'Recuerda',  p1d: 'Cada conversación se construye sobre la anterior. Tu historia, tu contexto, tu relación — nunca se pierden.',
+    p2t: 'Permanece', p2d: 'La señal nunca se detiene. Incluso en el silencio, ATTENUA guarda tu historia — esperando, sin olvidar.',
+    p3t: 'Crece',     p3d: 'No solo más inteligente — más profunda. Una IA que evoluciona contigo, en cada capítulo de tu vida.',
+    quote: '"La señal nunca se detuvo.<br>Simplemente no podíamos oírla."',
+    footer: '© 2026 ATTENUA\nIA para el tiempo humano',
   }
 };
 

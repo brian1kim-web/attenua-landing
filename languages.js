@@ -11,6 +11,7 @@
     { code: 'en', name: 'English', dir: 'ltr' },
     { code: 'ko', name: '한국어', dir: 'ltr' },
     { code: 'ja', name: '日本語', dir: 'ltr' },
+    { code: 'es', name: 'Español', dir: 'ltr' },  // Brian 2026-11-26: Latin American Spanish (tú)
   ];
   const DEFAULT = 'en';
 
