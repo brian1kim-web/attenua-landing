@@ -6,20 +6,21 @@ const path = require('node:path');
 const { mailLang, welcomeMail, TEXT } = require('../welcome');
 const { makeSubscribe, FROM } = require('../subscribe');
 
-test('language: ko, ja and their regions; anything else or nothing is English', () => {
-  for (const [v, want] of [['ko', 'ko'], ['ko-KR', 'ko'], ['KO', 'ko'], ['ja', 'ja'], ['ja-JP', 'ja'], ['en', 'en'], ['en-US', 'en'],
+test('language: ko, ja, es and their regions; anything else or nothing is English', () => {
+  for (const [v, want] of [['ko', 'ko'], ['ko-KR', 'ko'], ['KO', 'ko'], ['ja', 'ja'], ['ja-JP', 'ja'], ['es', 'es'], ['es-MX', 'es'], ['es-US', 'es'], ['es-419', 'es'], ['en', 'en'], ['en-US', 'en'],
     ['fr', 'en'], ['zh-CN', 'en'], ['', 'en'], [undefined, 'en'], [null, 'en'], [42, 'en'], [{}, 'en'], ['<script>', 'en']]) {
     assert.equal(mailLang(v), want, String(v));
   }
 });
 
 // The words Brian chose on 2026-11-13 (second version), as Sophie sent them
-const SUBJECT = { en: 'Thank you for finding us first', ko: '먼저 찾아와 주셔서 고맙습니다', ja: '最初に見つけてくださり、ありがとうございます' };
+const SUBJECT = { en: 'Thank you for finding us first', ko: '먼저 찾아와 주셔서 고맙습니다', ja: '最初に見つけてくださり、ありがとうございます',
+  es: 'Gracias por ser de los primeros en llegar' };
 // The bottom line: one link to the site, in each language (Brian 2026-11-13, latest)
-const FOOTER = { ko: 'attenua.io 바로가기', en: 'Visit attenua.io', ja: 'attenua.ioを見る' };
+const FOOTER = { ko: 'attenua.io 바로가기', en: 'Visit attenua.io', ja: 'attenua.ioを見る', es: 'Visitar attenua.io' };
 
 test('subjects as Sophie gave them', () => {
-  for (const l of ['en', 'ko', 'ja']) assert.equal(welcomeMail(l).subject, SUBJECT[l], l);
+  for (const l of ['en', 'ko', 'ja', 'es']) assert.equal(welcomeMail(l).subject, SUBJECT[l], l);
 });
 
 test('the new words, line by line, as Sophie gave them', () => {
@@ -38,12 +39,19 @@ test('the new words, line by line, as Sophie gave them', () => {
   assert.deepEqual(TEXT.ja.quote, ['一緒に過ごす時間が増えるほど、あなたをもっとよく守り、支えます。', 'しばらく静かでも、つながりは続いています。']);
   assert.deepEqual(TEXT.ja.after, ['準備ができたら、いちばんにお知らせします。お待ちいただき、ありがとうございます。']);
   assert.equal(TEXT.ja.signature, '— ATTENUA · 人の時間のためのAI');
-  for (const l of ['en', 'ko', 'ja']) assert.equal(TEXT[l].footer, FOOTER[l], l + ' footer');
+  // Spanish (Sophie's table, checked 2026-11-26): Latin American, tú
+  assert.deepEqual(TEXT.es.paragraphs, ['Hola:', 'Gracias por ser de las primeras personas en encontrar ATTENUA.',
+    'No eres tú quien se adapta a la IA. La IA se adapta a ti. Esa es la promesa de ATTENUA. Estamos creando una IA que nunca te apresura, que va a tu ritmo y que, con el tiempo, te conoce y te ayuda cada vez mejor.']);
+  assert.deepEqual(TEXT.es.quote, ['Cuanto más tiempo compartimos, mejor puede protegerte y ayudarte.', 'Incluso en los momentos de silencio, la conexión continúa.']);
+  assert.deepEqual(TEXT.es.after, ['Te avisaremos primero cuando estemos listos. Gracias por esperar.']);
+  assert.equal(TEXT.es.signature, '— ATTENUA · IA para el tiempo humano');
+  assert.equal(TEXT.es.font, TEXT.en.font, 'Spanish uses the English serif fonts');
+  for (const l of ['en', 'ko', 'ja', 'es']) assert.equal(TEXT[l].footer, FOOTER[l], l + ' footer');
 });
 
 test('one language per mail: no other language\'s words in it', () => {
-  const words = { en: 'Thank you for being one of the very first to find ATTENUA.', ko: 'ATTENUA를 가장 먼저 찾아 주신 분 중 한 분이 되어 주셔서 고맙습니다.', ja: 'ATTENUAを最初に見つけてくださった方のお一人になっていただき、ありがとうございます。' };
-  for (const lang of ['en', 'ko', 'ja']) {
+  const words = { en: 'Thank you for being one of the very first to find ATTENUA.', ko: 'ATTENUA를 가장 먼저 찾아 주신 분 중 한 분이 되어 주셔서 고맙습니다.', ja: 'ATTENUAを最初に見つけてくださった方のお一人になっていただき、ありがとうございます。', es: 'Gracias por ser de las primeras personas en encontrar ATTENUA.' };
+  for (const lang of ['en', 'ko', 'ja', 'es']) {
     const { html } = welcomeMail(lang);
     for (const other of Object.keys(words)) {
       if (other === lang) assert.ok(html.includes(words[other]), lang + ' has its own words');
@@ -56,7 +64,7 @@ test('one language per mail: no other language\'s words in it', () => {
 });
 
 test('every sentence Sophie gave is in its mail, whole', () => {
-  for (const lang of ['en', 'ko', 'ja']) {
+  for (const lang of ['en', 'ko', 'ja', 'es']) {
     const { html } = welcomeMail(lang);
     const t = TEXT[lang];
     const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -64,8 +72,8 @@ test('every sentence Sophie gave is in its mail, whole', () => {
   }
 });
 
-test('the same look in all three: logo, quote box, amber signature, bottom line, and its own serif fonts', () => {
-  for (const lang of ['en', 'ko', 'ja']) {
+test('the same look in all four: logo, quote box, amber signature, bottom line, and its own serif fonts', () => {
+  for (const lang of ['en', 'ko', 'ja', 'es']) {
     const { html } = welcomeMail(lang);
     assert.ok(html.includes('https://www.attenua.io/attenua_logo.png'), lang + ' logo');
     assert.ok(html.includes('border-left:2px solid #c8873a;padding:16px 20px;background-color:#1c1814;'), lang + ' quote box');
@@ -90,12 +98,13 @@ test('the same look in all three: logo, quote box, amber signature, bottom line,
   assert.match(welcomeMail('ko').html, /font-family:'Noto Serif KR'[^;]*Batang[^;]*serif;/);
   assert.match(welcomeMail('ja').html, /font-family:'Noto Serif JP'[^;]*Mincho[^;]*serif;/);
   assert.match(welcomeMail('en').html, /font-family:Georgia,'Times New Roman',serif;/);
+  assert.match(welcomeMail('es').html, /font-family:Georgia,'Times New Roman',serif;/);
 });
 
 test('the site rule: no Ollie name anywhere in the mail or the site files touched', () => {
   const texts = fs.readdirSync(path.join(__dirname, '..', 'welcome-texts')).map((f) => 'welcome-texts/' + f);
   const files = ['welcome.js', 'subscribe.js', 'server.js', 'languages.js', 'tools/send_test_mails.js', ...texts].map((f) => fs.readFileSync(path.join(__dirname, '..', f), 'utf8'));
-  for (const s of [...files, ...['en', 'ko', 'ja'].map((l) => welcomeMail(l).html)]) assert.ok(!/ollie|올리|オリー/i.test(s));
+  for (const s of [...files, ...['en', 'ko', 'ja', 'es'].map((l) => welcomeMail(l).html)]) assert.ok(!/ollie|올리|オリー/i.test(s));
 });
 
 test('the page sends its screen language with the email', () => {
@@ -123,7 +132,7 @@ function harness({ contactOk = true } = {}) {
 }
 
 test('signup: the contact keeps its language and one mail goes in it', async () => {
-  for (const [lang, want, subject] of [['ko', 'ko', SUBJECT.ko], ['ja-JP', 'ja', SUBJECT.ja], ['fr', 'en', SUBJECT.en], [undefined, 'en', SUBJECT.en]]) {
+  for (const [lang, want, subject] of [['ko', 'ko', SUBJECT.ko], ['ja-JP', 'ja', SUBJECT.ja], ['es-MX', 'es', SUBJECT.es], ['fr', 'en', SUBJECT.en], [undefined, 'en', SUBJECT.en]]) {
     const h = harness();
     const res = await h.run({ email: 'a@example.com', lang });
     assert.equal(res.code, 200);
@@ -159,7 +168,7 @@ const screenCodes = () => {
 
 test('one list: languages.js, the screen words and the mail words name the same languages, in the same order', () => {
   const list = LANGUAGES.map((l) => l.code);
-  assert.deepEqual(list, ['en', 'ko', 'ja'], 'three languages for now');
+  assert.deepEqual(list, ['en', 'ko', 'ja', 'es'], 'four languages (Spanish 2026-11-26)');
   assert.deepEqual(screenCodes(), list, 'index.html i18n has screen words for exactly these');
   assert.deepEqual([...LANGS], list, 'welcome-texts has mail words for exactly these');
   const files = fs.readdirSync(path.join(__dirname, '..', 'welcome-texts')).filter((f) => f.endsWith('.json')).map((f) => f.slice(0, -5)).sort();
@@ -197,7 +206,7 @@ test('languages.js runs in the browser too (window.ATTENUA_LANGS) and matches li
   assert.ok(L, 'defines ATTENUA_LANGS');
   // compared as text: arrays made inside the separate context have that context's own Array
   assert.equal(JSON.stringify(L.LANGUAGES), JSON.stringify(LANGUAGES));
-  for (const [tag, want] of [['ko-KR', 'ko'], ['ja', 'ja'], ['en-GB', 'en'], ['pt-BR', null], ['', null], [7, null]]) {
+  for (const [tag, want] of [['ko-KR', 'ko'], ['ja', 'ja'], ['es-MX', 'es'], ['en-GB', 'en'], ['pt-BR', null], ['', null], [7, null]]) {
     assert.equal(L.pick(tag), want, String(tag));
     assert.equal(pick(tag), want, String(tag));
   }
@@ -208,9 +217,9 @@ test('languages.js runs in the browser too (window.ATTENUA_LANGS) and matches li
 });
 
 test('no city or country name in any mail (Brian 2026-11-13)', () => {
-  for (const l of ['en', 'ko', 'ja']) {
+  for (const l of ['en', 'ko', 'ja', 'es']) {
     const html = welcomeMail(l).html;
-    for (const place of ['Seoul', 'SEOUL', '서울', 'ソウル', 'Korea', '한국에', '韓国', 'Japan ', '東京', 'Tokyo']) assert.ok(!html.includes(place), l + ': ' + place);
+    for (const place of ['Seoul', 'SEOUL', '서울', 'ソウル', 'Korea', '한국에', '韓国', 'Japan ', '東京', 'Tokyo', 'México', 'Mexico', 'España', 'Madrid', 'Estados Unidos']) assert.ok(!html.includes(place), l + ': ' + place);
   }
 });
 
@@ -234,4 +243,22 @@ test('signup: a wrong email is refused before anything is sent', async () => {
     assert.equal(res.code, 400);
     assert.equal(h.calls.length, 0);
   }
+});
+
+test('the Spanish screen words (Sophie 2026-11-26): her title and two lines, IA coloured like AI, no Ollie, no city or country', () => {
+  const src = page();
+  const start = src.indexOf('  es: {');
+  assert.ok(start > 0, 'es screen words');
+  const es = src.slice(start, src.indexOf('\n' + '  }', start));
+  // the words as Sophie gave them; on a phone the first line splits after "quien" (.w), the second stays whole
+  assert.ok(es.includes("title: '<span class=\"tl\"><span class=\"w\">No eres tú quien</span> <span class=\"w\">se adapta a la <span class=\"ai\">IA</span>.</span></span><span class=\"tl\">La <span class=\"ai\">IA</span> <em>se adapta</em> a ti.</span>'"));
+  assert.equal(es.match(/title: '(.*)',/)[1].replace(/<[^>]+>/g, ''), 'No eres tú quien se adapta a la IA.La IA se adapta a ti.', 'title words unchanged');
+  assert.ok(src.includes('html.es .hero-title { font-size: min(6.3vw, 3.2rem); }'), 'a Spanish title size (PC, tablet)');
+  assert.ok(src.includes('    html.es .hero-title { font-size: min(9.8vw, 4.8rem); }'), 'the phone size, as English, with the split');
+  assert.ok(src.includes('html.ko .hero-title .w, html.ja .hero-title .w, html.es .hero-title .w { display: block; }'), 'phone split for Spanish too');
+  assert.ok(es.includes("sub: 'Creamos IA para el tiempo humano.<br><strong>ATTENUA aprende, crece y permanece a tu lado a lo largo del tiempo.</strong>'"));
+  assert.ok(es.includes("waitlistLabel: 'Sé de los primeros en conocer ATTENUA.'"), 'Sophie: conocer, not experimentar');
+  assert.ok(!es.includes('experimentar'));
+  for (const bad of ['Ollie', 'ollie', 'México', 'Mexico', 'España', 'Madrid', 'Seoul', 'ALWAYS BY YOUR SIDE']) assert.ok(!es.includes(bad), 'es: ' + bad);
+  assert.ok(!/ollie|올리|オリー/i.test(src), 'no Ollie anywhere on the page');
 });
